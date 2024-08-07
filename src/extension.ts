@@ -1,26 +1,51 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import * as simpleGit from "simple-git";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  const git = simpleGit.default();
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "worktrees" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('worktrees.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Worktrees!');
-	});
-
-	context.subscriptions.push(disposable);
+  vscode.window.registerTreeDataProvider(
+    "worktrees",
+    new WorktreeProvider(git)
+  );
 }
 
-// This method is called when your extension is deactivated
-export function deactivate() {}
+class WorktreeProvider implements vscode.TreeDataProvider<WorktreeItem> {
+  private _onDidChangeTreeData: vscode.EventEmitter<
+    WorktreeItem | undefined | void
+  > = new vscode.EventEmitter<WorktreeItem | undefined | void>();
+  readonly onDidChangeTreeData: vscode.Event<WorktreeItem | undefined | void> =
+    this._onDidChangeTreeData.event;
+
+  constructor(private git: simpleGit.SimpleGit) {}
+
+  getTreeItem(element: WorktreeItem): vscode.TreeItem {
+    return element;
+  }
+
+  async getChildren(element?: WorktreeItem): Promise<WorktreeItem[]> {
+    if (element) {
+      return [];
+    } else {
+      const worktrees = await this.git.raw(["worktree", "list"]);
+      const worktreeLines = worktrees
+        .split("\n")
+        .filter((line) => line.trim() !== "");
+      return worktreeLines.map((line) => {
+        const match = line.match(/(.+)\s+\[(.+)\]/);
+        if (match) {
+          return new WorktreeItem(match[1], match[2]);
+        } else {
+          return new WorktreeItem(line, "");
+        }
+      });
+    }
+  }
+}
+
+class WorktreeItem extends vscode.TreeItem {
+  constructor(public readonly path: string, public readonly branch: string) {
+    super(path, vscode.TreeItemCollapsibleState.None);
+    this.description = branch;
+  }
+}
