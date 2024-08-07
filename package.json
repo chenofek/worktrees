@@ -12,6 +12,23 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "git",
+          "title": "Git",
+          "icon": "media/git.svg"
+        }
+      ]
+    },
+    "views": {
+      "git": [
+        {
+          "id": "worktrees",
+          "name": "Worktrees"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "worktrees.helloWorld",
