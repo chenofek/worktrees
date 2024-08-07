@@ -12,29 +12,29 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "worktrees.refresh",
+        "title": "Refresh Worktrees"
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "git",
-          "title": "Git",
-          "icon": "media/git.svg"
+          "id": "jeevan",
+          "title": "Jeevan",
+          "icon": "media/icon.svg"
         }
       ]
     },
     "views": {
-      "git": [
+      "jeevan": [
         {
           "id": "worktrees",
           "name": "Worktrees"
         }
       ]
-    },
-    "commands": [
-      {
-        "command": "worktrees.helloWorld",
-        "title": "Hello World"
-      }
-    ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
