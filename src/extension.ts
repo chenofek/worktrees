@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import { simpleGit, SimpleGit } from "simple-git";
-import * as path from "path";
 
 export function activate(context: vscode.ExtensionContext) {
   const workspaceFolders = vscode.workspace.workspaceFolders;
@@ -14,6 +13,13 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
       vscode.commands.registerCommand("worktrees.refresh", () =>
         worktreeProvider.refresh()
+      ),
+      vscode.commands.registerCommand(
+        "worktrees.copyToClipboard",
+        (value: string) => {
+          vscode.env.clipboard.writeText(value);
+          vscode.window.showInformationMessage(`Copied to clipboard: ${value}`);
+        }
       )
     );
   } else {
@@ -40,9 +46,11 @@ class WorktreeProvider implements vscode.TreeDataProvider<WorktreeItem> {
   }
 
   async getChildren(element?: WorktreeItem): Promise<WorktreeItem[]> {
-    if (element) {
-      return [];
-    } else {
+    if (element && element.children) {
+      // Return the children of the selected worktree
+      return element.children;
+    } else if (!element) {
+      // Root level, return all worktrees
       const worktrees = await this.git.raw(["worktree", "list"]);
       const worktreeLines = worktrees
         .split("\n")
@@ -58,18 +66,43 @@ class WorktreeProvider implements vscode.TreeDataProvider<WorktreeItem> {
 
       this.commonPrefix = this.findCommonPrefix(paths);
 
-      // Create WorktreeItem instances
+      // Create hierarchical WorktreeItem instances
       return worktreeLines.map((line) => {
         const match = line.match(/^(.+?)\s+\S+\s+\[([^\]]+)\]$/);
         if (match) {
           const fullPath = match[1].trim();
           const branch = match[2].trim();
           const relativePath = this.removeCommonPrefix(fullPath);
-          return new WorktreeItem(relativePath, fullPath, branch);
+
+          // Create child items (branch and path)
+          const branchItem = new WorktreeItem(
+            branch,
+            branch,
+            undefined,
+            "git-branch"
+          );
+          const pathItem = new WorktreeItem(
+            fullPath,
+            fullPath,
+            undefined,
+            "folder"
+          );
+
+          // Create parent item (worktree name) with children
+          const worktreeItem = new WorktreeItem(relativePath, fullPath, [
+            branchItem,
+            pathItem,
+          ]);
+          worktreeItem.collapsibleState =
+            vscode.TreeItemCollapsibleState.Expanded;
+
+          return worktreeItem;
         } else {
-          return new WorktreeItem(line.trim(), line.trim(), "");
+          return new WorktreeItem(line.trim(), line.trim());
         }
       });
+    } else {
+      return [];
     }
   }
 
@@ -94,14 +127,34 @@ class WorktreeProvider implements vscode.TreeDataProvider<WorktreeItem> {
 }
 
 class WorktreeItem extends vscode.TreeItem {
+  children: WorktreeItem[] | undefined;
+
   constructor(
-    public readonly relativePath: string,
-    public readonly fullPath: string,
-    public readonly branch: string
+    public readonly label: string,
+    public readonly value: string,
+    children?: WorktreeItem[],
+    iconPath?: string
   ) {
-    super(relativePath, vscode.TreeItemCollapsibleState.None);
-    this.description = branch;
-    this.tooltip = fullPath;
+    super(
+      label,
+      children && children.length > 0
+        ? vscode.TreeItemCollapsibleState.Collapsed
+        : vscode.TreeItemCollapsibleState.None
+    );
+    // this.tooltip = value;
+
+    if (iconPath) {
+      this.iconPath = new vscode.ThemeIcon(iconPath);
+    }
+
+    this.command = children
+      ? undefined
+      : {
+          command: "worktrees.copyToClipboard",
+          title: "Copy to Clipboard",
+          arguments: [value],
+        };
     this.contextValue = "worktreeItem";
+    this.children = children;
   }
 }
