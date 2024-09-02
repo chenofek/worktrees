@@ -18,7 +18,6 @@ export function activate(context: vscode.ExtensionContext) {
         "worktrees.copyToClipboard",
         (value: string) => {
           vscode.env.clipboard.writeText(value);
-          vscode.window.showInformationMessage(`Copied to clipboard: ${value}`);
         }
       )
     );
@@ -85,14 +84,22 @@ class WorktreeProvider implements vscode.TreeDataProvider<WorktreeItem> {
             fullPath,
             fullPath,
             undefined,
-            "folder"
+            "folder-opened"
           );
 
           // Create parent item (worktree name) with children
-          const worktreeItem = new WorktreeItem(relativePath, fullPath, [
-            branchItem,
-            pathItem,
-          ]);
+          const rootPathToProbe = this.capitalizeDrive(
+            this.rootPath.replace(/[\\]{1}/g, "/")
+          );
+          const iconToUse = rootPathToProbe.startsWith(fullPath)
+            ? "circle-filled"
+            : "circle-outline";
+          const worktreeItem = new WorktreeItem(
+            relativePath,
+            fullPath,
+            [branchItem, pathItem],
+            iconToUse
+          );
           worktreeItem.collapsibleState =
             vscode.TreeItemCollapsibleState.Expanded;
 
@@ -124,6 +131,10 @@ class WorktreeProvider implements vscode.TreeDataProvider<WorktreeItem> {
     }
     return fullPath;
   }
+
+  private capitalizeDrive(path: string): string {
+    return path.replace(/^([a-z])/, (_, drive) => `${drive.toUpperCase()}`);
+  }
 }
 
 class WorktreeItem extends vscode.TreeItem {
@@ -141,7 +152,6 @@ class WorktreeItem extends vscode.TreeItem {
         ? vscode.TreeItemCollapsibleState.Collapsed
         : vscode.TreeItemCollapsibleState.None
     );
-    // this.tooltip = value;
 
     if (iconPath) {
       this.iconPath = new vscode.ThemeIcon(iconPath);
