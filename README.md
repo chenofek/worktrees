@@ -1,71 +1,65 @@
-# worktrees README
+<div align="center">
 
-This is the README for your extension "worktrees". After writing up a brief description, we recommend including the following sections.
+# Worktrees
+
+**Smooth worktrees management**
+
+[![Repository](https://img.shields.io/badge/Repository-GitHub-blue?style=flat-square)](https://github.com/chenofek/worktrees)
+[![GitHub](https://img.shields.io/github/license/chenofek/worktrees?style=flat-square)](https://github.com/chenofek/worktrees/blob/main/LICENSE)
+
+
+
+</div>
+
+Welcome to **Worktrees**, a VSCode extension that enhances Git worktree management directly within the editor. This extension provides an intuitive interface to view, navigate, and manage Git worktrees and branches in your repository.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- **Hierarchical View of Worktrees**: Visualize your Git worktrees and associated branches in a clean, hierarchical structure.
+- **Copy to Clipboard**: Easily copy worktree paths and branch names using a convenient copy icon for each item.
+- **Automatic Refresh**: Refresh the worktree list with a single click or automatically upon changes.
 
-For example if there is an image subfolder under your extension project workspace:
+<br/>
 
-\!\[feature X\]\(images/feature-x.png\)
+Screenshots of the extension in action:
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+![Worktrees View](media/worktrees-view.png)
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+This extension requires:
+- **Git** to be installed and available in your system's PATH.  
+- A VSCode workspace with an initialized Git repository.
+
+### Optional Dependencies
+- None at this time, but ensure Git is properly configured for your workspace.
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+The **Worktrees** extension does not add any new configuration settings for now. Future updates may introduce additional settings for customizing your experience.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- On some systems, the worktree paths may not display properly if Git is not correctly configured.
+- Currently, only the paths and branches of worktrees are shown; more advanced Git features might be added in future releases.
+
+For more details, check out our [issue tracker](#).
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
-
 ### 1.0.0
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+- Initial release with basic functionality:
+  - Display worktrees and branches in a hierarchical view.
+  - Copy worktree paths and branches to clipboard using dedicated icons.
+  - Auto-refresh worktree list.
 
 ---
 
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
 ## For more information
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+- Learn more about Git worktrees: [Git Worktree Documentation](https://git-scm.com/docs/git-worktree)
+
+<br/><br/>
 
 **Enjoy!**
